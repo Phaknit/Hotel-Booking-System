@@ -1,297 +1,287 @@
 package PDIproject;
 
-import java.util.Scanner;
 import java.util.regex.Pattern;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.sql.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDateTime;
 
+public class UserRegistration extends JFrame {
+    private JTextField fnameField;
+    private JTextField lnameField;
+    private JTextField emailField;
+    private JTextField phoneNumField;
+    private JTextField dateOfBirthField;
+    private JTextField usernameField;
+    private JPasswordField passwordField;
 
-public class UserRegistration { // declare variable to store user input
-	    private String fname;
-	    private String lname;
-	    private String email;
-	    private String phoneNum;
-	    private String dateOfBirth;
-	    private String username;
-	    private String password;
+    public UserRegistration() {
+           	setTitle("Sign Up");
+            setSize(500, 400);
+            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            setLocationRelativeTo(null);
+            setLayout(new BorderLayout());
 
-	    // Default Constructor
-	    public UserRegistration() {
-	        // Default constructor
-	    }
+            // === TOP PANEL (Title) ===
+            JLabel titleLabel = new JLabel("Sign up Your Account", SwingConstants.CENTER);
+            titleLabel.setFont(new Font("Serif", Font.BOLD, 22));
+            titleLabel.setForeground(new Color(50, 50, 150));
+            titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+            add(titleLabel, BorderLayout.NORTH);
 
-	    // Method to collect user input
-	    public void userInput() {
-	        Scanner input = new Scanner(System.in); 
-	        
-	        System.out.println("***Input user information***");
+            // === CENTER PANEL (Form) ===
+            JPanel formPanel = new JPanel(new GridBagLayout());
+            formPanel.setBorder(BorderFactory.createEmptyBorder(10, 40, 10, 40));
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.anchor = GridBagConstraints.WEST;
+            gbc.insets = new Insets(5, 5, 5, 5);
 
-	        // ask for user first name and store the input to fname, if it is invalid to the validate condition that had set invalid message will display
-	        do {
-	            System.out.print("Firstname: ");
-	            this.fname = input.nextLine();
-	            if (!validateFirstName(this.fname)) {
-	                System.out.println("Invalid first name. Please enter letters only.");
-	            }
-	        } while (!validateFirstName(this.fname));
+            // Add form fields
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            formPanel.add(new JLabel("First name:"), gbc);
+            gbc.gridx = 1;
+            fnameField = new JTextField(15);
+            formPanel.add(fnameField, gbc);
 
-	        do {
-	            System.out.print("Lastname: ");
-	            this.lname = input.nextLine();
-	            if (!validateLastName(this.lname)) {
-	                System.out.println("Invalid last name. Please enter letters only.");
-	            }
-	        } while (!validateLastName(this.lname));
+            gbc.gridx = 0;
+            gbc.gridy++;
+            formPanel.add(new JLabel("Last name:"), gbc);
+            gbc.gridx = 1;
+            lnameField = new JTextField(15);
+            formPanel.add(lnameField, gbc);
 
-	        do {
-	            System.out.print("Email address: ");
-	            this.email = input.nextLine();
-	            if (!validateEmail(this.email)) {
-	                System.out.println("Invalid email format. Please enter a valid email.");
-	            }
-	        } while (!validateEmail(this.email));
+            gbc.gridx = 0;
+            gbc.gridy++;
+            formPanel.add(new JLabel("Email:"), gbc);
+            gbc.gridx = 1;
+            emailField = new JTextField(15);
+            formPanel.add(emailField, gbc);
 
-	        do {
-	            System.out.print("Phone number: ");
-	            this.phoneNum = input.nextLine();
-	            if (!validatePhoneNumber(this.phoneNum)) {
-	                System.out.println("Invalid phone number. Please enter 8 to 10 digits.");
-	            }
-	        } while (!validatePhoneNumber(this.phoneNum));
+            gbc.gridx = 0;
+            gbc.gridy++;
+            formPanel.add(new JLabel("Phone number:"), gbc);
+            gbc.gridx = 1;
+            phoneNumField = new JTextField(15);
+            formPanel.add(phoneNumField, gbc);
 
-	        do {
-	            System.out.print("Date of Birth (yyyy-MM-dd): ");
-	            this.dateOfBirth = input.nextLine();
-	            if (!validateDate(this.dateOfBirth)) {
-	                System.out.println("Invalid date format. Please enter date in yyyy-MM-dd format.");
-	            }
-	        } while (!validateDate(this.dateOfBirth));
+            gbc.gridx = 0;
+            gbc.gridy++;
+            formPanel.add(new JLabel("Date of Birth (yyyy-MM-dd):"), gbc);
+            gbc.gridx = 1;
+            dateOfBirthField = new JTextField(15);
+            formPanel.add(dateOfBirthField, gbc);
 
-	        System.out.println();
+            gbc.gridx = 0;
+            gbc.gridy++;
+            formPanel.add(new JLabel("Username:"), gbc);
+            gbc.gridx = 1;
+            usernameField = new JTextField(15);
+            formPanel.add(usernameField, gbc);
 
-	        do {
-	            System.out.print("Username: ");
-	            this.username = input.nextLine();
-	            if (!validateUsername(this.username)) {
-	                System.out.println("Username cannot be empty.");
-	            }
-	        } while (!validateUsername(this.username));
+            gbc.gridx = 0;
+            gbc.gridy++;
+            formPanel.add(new JLabel("Password:"), gbc);
+            gbc.gridx = 1;
+            passwordField = new JPasswordField(15);
+            formPanel.add(passwordField, gbc);
 
-	        do {
-	            System.out.print("Password: ");
-	            this.password = input.nextLine();
-	            if (!validatePassword(this.password)) {
-	                System.out.println("Password must be at least 8 characters long and include both letters and numbers.");
-	            }
-	        } while (!validatePassword(this.password));
+            add(formPanel, BorderLayout.CENTER);
 
-	        input.close();
-	    }
+            // === BOTTOM PANEL (Buttons) ===
+            JPanel buttonPanel = new JPanel();
+            JButton registerButton = new JButton("Register");
+            JButton backButton = new JButton("Back");
 
-	    // Validation methods
-	    public static boolean validateFirstName(String fname) {
-	        return fname != null && fname.matches("^[A-Za-z]+$");
-	    }
+            // Button Styling
+            registerButton.setBackground(new Color(34, 167, 240));
+            registerButton.setForeground(Color.WHITE);
+            backButton.setBackground(new Color(242, 38, 19));
+            backButton.setForeground(Color.WHITE);
+            registerButton.setFocusPainted(false);
+            backButton.setFocusPainted(false);
 
-	    public static boolean validateLastName(String lname) {
-	        return lname != null && lname.matches("^[A-Za-z]+$");
-	    }
+            buttonPanel.add(registerButton);
+            buttonPanel.add(backButton);
+            add(buttonPanel, BorderLayout.SOUTH);
 
-	    public static boolean validateEmail(String email) {
-	        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." +
-	                "[a-zA-Z0-9_+&*-]+)*@" +
-	                "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
-	                "A-Z]{2,7}$";
-	        Pattern pattern = Pattern.compile(emailRegex);
-	        return email != null && pattern.matcher(email).matches();
-	    }
+            // Register button action
+            registerButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (userInput()) {
+                        if (saveToDatabase()) {
+                            logUserActivity("Sign-Up SUCCESS - Username: " + usernameField.getText().trim() + " - " + LocalDateTime.now());
+                            new UserLogin().setVisible(true);
+                            dispose();
+                        } else {
+                            logUserActivity("Sign-Up FAILED - Username: " + usernameField.getText().trim() + " - " + LocalDateTime.now());
+                        }
+                    }
+                }
+            });
 
-	    public static boolean validatePhoneNumber(String phoneNum) {
-	        return phoneNum != null && phoneNum.matches("^\\d{8,10}$");
-	    }
+            // Back button action
+            backButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    new WelcomeHomePageGUI().setVisible(true);
+                    dispose();
+                }
+            });
 
-	    public static boolean validateDate(String dateOfBirth) {
-	        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-	        dateFormat.setLenient(false);
-	        try {
-	            Date parsedDate = dateFormat.parse(dateOfBirth);
-	            return true;
-	        } catch (ParseException e) {
-	            return false;
-	        }
-	    }
+            setVisible(true);
+        }
+    // Method to collect and validate user input
+    public boolean userInput() {
+        String fname = fnameField.getText().trim();
+        String lname = lnameField.getText().trim();
+        String email = emailField.getText().trim();
+        String phoneNum = phoneNumField.getText().trim();
+        String dateOfBirth = dateOfBirthField.getText().trim();
+        String username = usernameField.getText().trim();
+        String password = new String(passwordField.getPassword());
 
-	    public static boolean validateUsername(String username) {
-	        return username != null && !username.isEmpty();
-	    }
+        if (!validateFirstName(fname)) {
+            showMessage("Invalid first name. Please enter letters only.");
+            return false;
+        }
+        if (!validateLastName(lname)) {
+            showMessage("Invalid last name. Please enter letters only.");
+            return false;
+        }
+        if (!validateEmail(email)) {
+            showMessage("Invalid email format. Please enter a valid email.");
+            return false;
+        }
+        if (!validatePhoneNumber(phoneNum)) {
+            showMessage("Invalid phone number. Please enter 8 to 10 digits.");
+            return false;
+        }
+        if (!validateDateOfBirth(dateOfBirth)) {
+            showMessage("Invalid date format. Please enter date in yyyy-MM-dd format.");
+            return false;
+        }
+        if (!validateUsername(username)) {
+            showMessage("Username cannot be empty.");
+            return false;
+        }
+        if (!validatePassword(password)) {
+            showMessage("Password must be at least 8 characters long and include both letters and numbers.");
+            return false;
+        }
 
-	    public static boolean validatePassword(String password) {
-	        return password != null && password.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$");
-	    }
+        return true;
+    }
 
-	    // Method to save user data to the database
-	    public void saveToDatabase() {
-	        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:RegistrationInfo.db")) {
-	            String createTableSQL = "CREATE TABLE IF NOT EXISTS users (" +
-	                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-	                    "firstname TEXT, " +
-	                    "lastname TEXT, " +
-	                    "email TEXT UNIQUE, " +
-	                    "phone_number TEXT, " +
-	                    "date_of_birth TEXT, " +
-	                    "username TEXT UNIQUE, " +
-	                    "password TEXT)";
-	            conn.createStatement().execute(createTableSQL);
+    private void showMessage(String message) {
+        JOptionPane.showMessageDialog(this, message, "Input Error", JOptionPane.ERROR_MESSAGE);
+    }
 
-	            String insertSQL = "INSERT INTO users (firstname, lastname, email, phone_number, date_of_birth, username, password) VALUES (?, ?, ?, ?, ?, ?, ?)";
-	            PreparedStatement pstmt = conn.prepareStatement(insertSQL);
-	            pstmt.setString(1, this.fname);
-	            pstmt.setString(2, this.lname);
-	            pstmt.setString(3, this.email);
-	            pstmt.setString(4, this.phoneNum);
-	            pstmt.setString(5, this.dateOfBirth);
-	            pstmt.setString(6, this.username);
-	            pstmt.setString(7, this.password);
-	            pstmt.executeUpdate();
+    // Validation methods
+    public static boolean validateFirstName(String fname) {
+        return fname.matches("^[A-Za-z]+$");
+    }
 
-	            System.out.println("\nRegistration successful!");
+    public static boolean validateLastName(String lname) {
+        return lname.matches("^[A-Za-z]+$");
+    }
 
-	        } catch (SQLException e) {
-	            if (e.getMessage().contains("UNIQUE constraint failed")) {
-	                System.out.println("The email or username already exists. Please use a different one.");
-	            } else {
-	                e.printStackTrace();
-	            }
-	        }
-	    }
+    public static boolean validateEmail(String email) {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." +
+                "[a-zA-Z0-9_+&*-]+)*@" +
+                "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
+                "A-Z]{2,7}$";
+        return Pattern.compile(emailRegex).matcher(email).matches();
+    }
 
-	    // Method to display user data from the database
-	    public void display() {
-	        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:RegistrationInfo.db")) {
-	            String query = "SELECT * FROM users WHERE username = ?";
-	            PreparedStatement stmt = conn.prepareStatement(query);
-	            stmt.setString(1, this.username);
-	            ResultSet rs = stmt.executeQuery();
+    public static boolean validatePhoneNumber(String phoneNum) {
+        return phoneNum.matches("^\\d{8,10}$");
+    }
 
-	            if (rs.next()) {
-	                System.out.println("\n***Personal Information***");
-	                System.out.println("Firstname: " + rs.getString("firstname"));
-	                System.out.println("Lastname: " + rs.getString("lastname"));
-	                System.out.println("Email: " + rs.getString("email"));
-	                System.out.println("Phone Number: " + rs.getString("phone_number"));
-	                System.out.println("Date of Birth: " + rs.getString("date_of_birth"));
-	                System.out.println("\n***Account Details***");
-	                System.out.println("Username: " + rs.getString("username"));
-	                System.out.println("Password: " + rs.getString("password"));
-	                System.out.println("-----------------------------");
-	            } else {
-	                System.out.println("No user found with username: " + this.username);
-	            }
+    public static boolean validateDateOfBirth(String dateOfBirth) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        dateFormat.setLenient(false);
+        try {
+            dateFormat.parse(dateOfBirth);
+            return true;
+        } catch (ParseException e) {
+            return false;
+        }
+    }
 
-	        } catch (SQLException e) {
-	            e.printStackTrace();
-	        }
-	    }
-	    
-	    public class UserLogin {
-	    	private static String username;
-	    	private static String password;
-	    	
-	    	 public static boolean validateUsername(String username) {
-	    	        return username != null && !username.isEmpty();
-	    	    }
+    public static boolean validateUsername(String username) {
+        return !username.isEmpty();
+    }
 
-	    	    public static boolean validatePassword(String password) {
-	    	        return password != null && password.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$");
-	    	    }
-	    	public void userLogin() {
-	    		Scanner input = new Scanner(System.in);
-	    		
-	            do {
-	                System.out.print("Username: ");
-	                this.username = input.nextLine();
-	                if (!validateUsername(this.username)) {
-	                    System.out.println("Username cannot be empty.");
-	                }
-	            } while (!validateUsername(this.username));
+    public static boolean validatePassword(String password) {
+        return password.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$");
+    }
 
-	            do {
-	                System.out.print("Password: ");
-	                this.password = input.nextLine();
-	                if (!validatePassword(this.password)) {
-	                    System.out.println("Password must be at least 8 characters long and include both letters and numbers.");
-	                }
-	            } while (!validatePassword(this.password));
+    // 📝 Log user activity
+    private void logUserActivity(String activity) {
+        try (FileWriter writer = new FileWriter("user_activity_log.txt", true)) {
+            writer.write(activity + "\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-	            input.close();
-	    			
-	    	}
-	    	
-	    	 public boolean userLoginCheck () {
-	    	    	String selectUserSQL = "SELECT * FROM Users WHERE username = ? AND password = ?";
-	    	
-	    	        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:RegistrationInfo.db");
-	    	             PreparedStatement stmt = conn.prepareStatement(selectUserSQL)) {
-	    	             
-	    	            stmt.setString(1, username);
-	    	            stmt.setString(2, password); // Use password hashing in production
-	    	            ResultSet rs = stmt.executeQuery();
-	    	
-	    	            return rs.next(); // User found
-	    	        } catch (SQLException e) {
-	    	            e.printStackTrace();
-	    	            return false;
-	    	        }
-	    	    }
-	    }
-//	    public boolean userLogin (String username, String password) {
-//	    	String selectUserSQL = "SELECT * FROM Users WHERE username = ? AND password = ?";
-//	
-//	        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:RegistrationInfo.db");
-//	             PreparedStatement stmt = conn.prepareStatement(selectUserSQL)) {
-//	             
-//	            stmt.setString(1, username);
-//	            stmt.setString(2, password); // Use password hashing in production
-//	            ResultSet rs = stmt.executeQuery();
-//	
-//	            return rs.next(); // User found
-//	        } catch (SQLException e) {
-//	            e.printStackTrace();
-//	            return false;
-//	        }
-//	    }
-	    
-	   
+    // Method to save user data to the database
+    public boolean saveToDatabase() {
+        String fname = fnameField.getText().trim();
+        String lname = lnameField.getText().trim();
+        String email = emailField.getText().trim();
+        String phoneNum = phoneNumField.getText().trim();
+        String dateOfBirth = dateOfBirthField.getText().trim();
+        String username = usernameField.getText().trim();
+        String password = new String(passwordField.getPassword());
 
-	    // Main method
-	    public static void main(String[] args) {
-	        // Create object using the default constructor
-	        UserRegistration user = new UserRegistration();
-//	        UserLogin login = new UserLogin();
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:RegistrationInfo.db")) {
+            String createTableSQL = "CREATE TABLE IF NOT EXISTS users (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "firstname TEXT, " +
+                    "lastname TEXT, " +
+                    "email TEXT UNIQUE, " +
+                    "phone_number TEXT, " +
+                    "date_of_birth TEXT, " +
+                    "username TEXT UNIQUE, " +
+                    "password TEXT)";
+            conn.createStatement().execute(createTableSQL);
 
-	        // Collect user input
-	        user.userInput();
+            String insertSQL = "INSERT INTO users (firstname, lastname, email, phone_number, date_of_birth, username, password) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement pstmt = conn.prepareStatement(insertSQL)) {
+                pstmt.setString(1, fname);
+                pstmt.setString(2, lname);
+                pstmt.setString(3, email);
+                pstmt.setString(4, phoneNum);
+                pstmt.setString(5, dateOfBirth);
+                pstmt.setString(6, username);
+                pstmt.setString(7, password);
+                pstmt.executeUpdate();
+            }
 
-	        // Save user data to database
-	        user.saveToDatabase();
+            JOptionPane.showMessageDialog(this, "Registration successful!");
+            return true;
 
-	        // Display user data
-	        user.display();
-	       
-			 
-//			 user.userLogin();
-//			 boolean isValidUser = login.userLoginCheck();
-//
-//		        if (isValidUser) {
-//		            System.out.println("Login successful!");
-//		        } else {
-//		            System.out.println("Invalid username or password.");
-//		        }
-//			 
-	    }
-	}
-	  
+        } catch (SQLException e) {
+            if (e.getMessage().contains("UNIQUE constraint failed")) {
+                showMessage("The email or username already exists. Please use a different one.");
+            } else {
+                e.printStackTrace();
+            }
+            return false;
+        }
+    }
 
-
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new UserRegistration().setVisible(true));
+    }
+}
