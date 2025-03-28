@@ -132,7 +132,7 @@ public class UserRegistration extends JFrame {
             // Back button action
             backButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    new WelcomeHomePageGUI().setVisible(true);
+                    new HotelWelcomePage().setVisible(true);
                     dispose();
                 }
             });

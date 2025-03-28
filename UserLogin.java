@@ -2,17 +2,12 @@ package PDIproject;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.*;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.time.LocalDateTime;
 
 public class UserLogin extends JFrame {
     private JTextField usernameField;
     private JPasswordField passwordField;
-    private static final String DB_URL = "jdbc:sqlite:RegistrationInfo.db";
+    private static final String DB_URL = "jdbc:sqlite:RegistrationInfo.db"; 
 
     public UserLogin() {
         setTitle("User Login");
@@ -21,14 +16,17 @@ public class UserLogin extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // === TOP PANEL (Title) ===
+        // Create the login_activity table if it doesn't exist
+        createTableIfNotExists();
+
+        // === TITLE PANEL ===
         JLabel titleLabel = new JLabel("Login to Your Account", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Serif", Font.BOLD, 22));
         titleLabel.setForeground(new Color(50, 50, 150));
         titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         add(titleLabel, BorderLayout.NORTH);
 
-        // === CENTER PANEL (Login Form) ===
+        // === FORM PANEL ===
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -51,12 +49,12 @@ public class UserLogin extends JFrame {
 
         add(formPanel, BorderLayout.CENTER);
 
-        // === BOTTOM PANEL (Buttons) ===
+        // === BUTTON PANEL ===
         JPanel buttonPanel = new JPanel();
         JButton loginButton = new JButton("Login");
         JButton backButton = new JButton("Back");
 
-        // Button Styling
+        // Styling
         loginButton.setBackground(new Color(34, 167, 240));
         loginButton.setForeground(Color.WHITE);
         backButton.setBackground(new Color(242, 38, 19));
@@ -69,10 +67,10 @@ public class UserLogin extends JFrame {
         buttonPanel.add(backButton);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        // === Button Actions ===
+        // === BUTTON ACTIONS ===
         loginButton.addActionListener(e -> authenticateUser());
         backButton.addActionListener(e -> {
-            new WelcomeHomePageGUI().setVisible(true);
+            new HotelWelcomePage().setVisible(true);
             dispose();
         });
 
@@ -86,30 +84,33 @@ public class UserLogin extends JFrame {
         if (validateUsername(username) && validatePassword(password)) {
             if (checkCredentials(username, password)) {
                 JOptionPane.showMessageDialog(this, "✅ Login successful! Welcome, " + username);
-                logUserActivity("Login SUCCESS - Username: " + username + " - " + LocalDateTime.now());
+                logUserActivity(username, "Login SUCCESS");
 
-                new GUI().setVisible(true);
-                dispose();
+                new HotelMainPage();
+                dispose(); // Close login window
             } else {
                 JOptionPane.showMessageDialog(this, "❌ Invalid username or password!", "Login Failed", JOptionPane.ERROR_MESSAGE);
-                logUserActivity("Login FAILED - Username: " + username + " - " + LocalDateTime.now());
+                logUserActivity(username, "Login FAILED");
             }
         } else {
             JOptionPane.showMessageDialog(this, "⚠️ Username and password must be valid!", "Invalid Input", JOptionPane.WARNING_MESSAGE);
         }
     }
 
-    private void logUserActivity(String activity) {
-        try (FileWriter writer = new FileWriter("user_activity_log.txt", true)) {
-            writer.write(activity + "\n");
-        } catch (IOException e) {
+    private void logUserActivity(String username, String activity) {
+        String query = "INSERT INTO login_activity (username, activity) VALUES (?, ?)";
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, username);
+            stmt.setString(2, activity);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     private boolean checkCredentials(String username, String password) {
         String query = "SELECT * FROM users WHERE username = ? AND password = ?";
-
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, username);
@@ -119,6 +120,22 @@ public class UserLogin extends JFrame {
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    private void createTableIfNotExists() {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS login_activity (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "username TEXT, " +
+                "activity TEXT NOT NULL, " +
+                "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
+                ");";
+
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             Statement stmt = conn.createStatement()) {
+            stmt.execute(createTableSQL);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
